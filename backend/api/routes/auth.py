@@ -1,5 +1,9 @@
 from flask import Blueprint
-from api.controllers.auth import login_controller, company_registration_controller, student_registration_controller, me_controller
+from api.controllers.auth import (
+    login_controller, 
+    company_registration_controller, 
+    student_registration_controller
+)
 
 from flask_jwt_extended import jwt_required
 

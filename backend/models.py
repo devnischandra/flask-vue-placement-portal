@@ -27,6 +27,7 @@ class Company(db.Model):
     id = db.Column(db.Integer, db.ForeignKey("users.id"), primary_key=True)
     hr_contact = db.Column(db.String(10), nullable=True)
     website_url = db.Column(db.Text, nullable=True)
+    
     is_approved = db.Column(db.Boolean, nullable=False, default=False)
 
     placement_drives = db.relationship("PlacementDrive", backref="company", cascade="all, delete-orphan")
