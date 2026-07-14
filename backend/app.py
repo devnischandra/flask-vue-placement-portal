@@ -2,17 +2,22 @@ import os
 from dotenv import load_dotenv
 from flask import Flask
 
-from extensions import db, bcrypt
+from extensions import db, bcrypt, jwt
 from models import User
+
+from api import api_bp
 
 load_dotenv()
 
 app = Flask(__name__)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///placement_portal_app_db"
+app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
+
 
 db.init_app(app)
 bcrypt.init_app(app)
+jwt.init_app(app)
 
 with app.app_context():
     db.create_all()
@@ -34,6 +39,12 @@ with app.app_context():
 
         db.session.add(admin)
     db.session.commit()
+
+@app.errorhandler(400)
+def error_handler_400(e):
+    return {"msg":e.name}, 400
+
+app.register_blueprint(api_bp)
 
 if __name__ == "__main__":
     app.run(debug=True)
