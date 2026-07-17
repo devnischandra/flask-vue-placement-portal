@@ -1,6 +1,7 @@
 from extensions import db
 
 USER_ROLE_ENUM = db.Enum("admin","company","student")
+COMPANY_STATUS_ENUM = db.Enum("pending","approved","rejected")
 STUDENT_GENDER_ENUM = db.Enum("male","female","other")
 JOB_MODE_ENUM = db.Enum("office","remote","hybrid")
 APPLICATION_STATUS_ENUM = db.Enum("applied", "shortlisted", "selected", "rejected")
@@ -28,7 +29,7 @@ class Company(db.Model):
     hr_contact = db.Column(db.String(10), nullable=True)
     website_url = db.Column(db.Text, nullable=True)
     
-    is_approved = db.Column(db.Boolean, nullable=False, default=False)
+    status = db.Column(db.COMPANY_STATUS_ENUM, nullable=False,default="pending")
 
     placement_drives = db.relationship("PlacementDrive", backref="company", cascade="all, delete-orphan")
 
@@ -42,12 +43,10 @@ class Student(db.Model):
     department = db.Column(db.Text, nullable=False)
     cgpa = db.Column(db.Numeric(3,2), nullable=False)
     resume_url = db.Column(db.Text, nullable=True)
-    is_placed = db.Column(db.Boolean, nullable=False, default=False)
 
     applications = db.relationship("Application", backref="student", cascade="all, delete-orphan")
 
 # location -> can be NULL (when job_mode -> remote)
-# (is_approved: True) -> bcz only approved companies can login -> hence create drive -> but admin can disapprove placement_drive
 class PlacementDrive(db.Model):
     __tablename__ = "placement_drives"
 
@@ -60,17 +59,17 @@ class PlacementDrive(db.Model):
     minimum_cgpa = db.Column(db.Float, nullable=False)
     start_date = db.Column(db.Date, nullable=False)
     end_date = db.Column(db.Date, nullable=False)
-    is_approved = db.Column(db.Boolean, nullable=False, default=True)
 
     applications = db.relationship("Application", backref="placement_drive", cascade="all, delete-orphan")
 
-# (interview_date) -> can be NULL
+# (interview_date,company_feedback) -> can be NULL
 class Application(db.Model):
     __tablename__ = "applications"
 
-    id = db.Column(db.Integer, primary_key=True)
-    student_id = db.Column(db.Integer, db.ForeignKey("students.id"), nullable=False)
-    placement_drive_id = db.Column(db.Integer, db.ForeignKey("placement_drives.id"), nullable=False)
-    applied_date = db.Column(db.Date, nullable=False)
-    application_status = db.Column(APPLICATION_STATUS_ENUM, nullable=False, default="applied")
+    id=db.Column(db.Integer, primary_key=True)
+    student_id=db.Column(db.Integer, db.ForeignKey("students.id"), nullable=False)
+    placement_drive_id=db.Column(db.Integer, db.ForeignKey("placement_drives.id"), nullable=False)
+    applied_date =db.Column(db.Date, nullable=False)
+    status = db.Column(APPLICATION_STATUS_ENUM, nullable=False, default="applied")
     interview_date = db.Column(db.Date, nullable=True)
+    company_feedback=db.Column(db.Text, nullable=True)

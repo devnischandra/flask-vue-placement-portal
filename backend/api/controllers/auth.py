@@ -13,9 +13,13 @@ def login_controller():
 
     if email and password:
         user=User.query.filter_by(email=email).first()
-        if user and bcrypt.check_password_hash(user.password_hash,password):
-            current_user_id=user.id
+        if user and bcrypt.check_password_hash(user.password_hash,password) and (not user.is_blacklisted):
             current_user_role=user.role
+            
+            if current_user_role=="company" and not(user.company.is_approved):
+                return {"msg":"WAIT FOR ADMIN APPROVAL!"}, 200
+            
+            current_user_id=user.id
             additional_claims = {"current_user_role":str(user.role)}
             access_token=create_access_token(str(current_user_id),additional_claims=additional_claims)
             return {
@@ -82,19 +86,19 @@ def student_registration_controller():
         db.session.add(new_user)
         db.session.flush()
 
-        date_of_birth=datetime.strptime(date_of_birth,"%d-%m-%Y").date()
-
-        new_student=Student(
-            id=new_user.id,
-            gender=gender,
-            date_of_birth=date_of_birth,
-            department=department,
-            cgpa=cgpa,
-            resume_url=resume_url
-        )
-        db.session.add(new_student)
-        db.session.commit()
-        return{
-            "msg":"STUDENT REGISTERED SUCCESSFULLY!"
-        },200
+        if [gender, date_of_birth, department, cgpa]:
+            date_of_birth=datetime.strptime(date_of_birth,"%d-%m-%Y").date()
+            new_student=Student(
+                id=new_user.id,
+                gender=gender,
+                date_of_birth=date_of_birth,
+                department=department,
+                cgpa=cgpa,
+                resume_url=resume_url
+            )
+            db.session.add(new_student)
+            db.session.commit()
+            return{
+                "msg":"STUDENT REGISTERED SUCCESSFULLY!"
+            },200
     return abort(400)

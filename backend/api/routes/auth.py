@@ -5,8 +5,6 @@ from api.controllers.auth import (
     student_registration_controller
 )
 
-from flask_jwt_extended import jwt_required
-
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 
 @auth_bp.route("/login", methods=["POST"])

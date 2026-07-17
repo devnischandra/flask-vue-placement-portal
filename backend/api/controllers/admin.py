@@ -2,7 +2,7 @@ from flask import request, abort
 from extensions import db
 from models import User, Company, Student, PlacementDrive, Application
 
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 
 def search_controller():
     data=request.args
@@ -26,7 +26,7 @@ def search_controller():
                     "is_blacklisted":c.user.is_blacklisted,
                     "hr_contact":c.hr_contact,
                     "website_url":c.website_url,
-                    "is_approved":c.is_approved
+                    "status":c.status
                 } for c in companies
             ], 200
 
@@ -41,8 +41,7 @@ def search_controller():
                     "date_of_birth":datetime.strftime(s.date_of_birth, "%d-%m-%Y"),
                     "department":s.department,
                     "cgpa":s.cgpa,
-                    "resume_url":s.resume_url,
-                    "is_placed":s.is_placed
+                    "resume_url":s.resume_url
                 } for s in students
             ], 200
             
@@ -73,24 +72,24 @@ def get_companies_controller():
             "is_blacklisted":c.user.is_blacklisted,
             "hr_contact":c.hr_contact,
             "website_url":c.website_url,
-            "is_approved":c.is_approved
+            "status":c.status
         } for c in companies
     ], 200
 
-def approve_company_controller(company_id):
-    company = Company.query.get(company_id)
+def approve_pending_company_controller(company_id):
+    company = Company.query.filter(Company.status=="pending", Company.id==company_id).first()
     if company:
-        company.is_approved = True
+        company.status = "approved"
         db.session.commit()
         return {"msg": "COMPANY APPROVED SUCCESSFULLY!"}, 200
     return abort(400)
 
-def delete_company_controller(company_id):
-    company = Company.query.get(company_id)
+def reject_pending_company_controller(company_id):
+    company = Company.query.filter(Company.status=="pending", Company.id==company_id).first()
     if company:
-        db.session.delete(company)
+        company.status = "rejected"
         db.session.commit()
-        return {"msg": "COMPANY DELETED SUCCESSFULLY!"}, 200
+        return {"msg": "COMPANY REJECTED SUCCESSFULLY!"}, 200
     return abort(400)
 
 def get_students_controller():
@@ -105,15 +104,20 @@ def get_students_controller():
             "date_of_birth":datetime.strftime(s.date_of_birth, "%d-%m-%Y"),
             "department":s.department,
             "cgpa":s.cgpa,
-            "resume_url":s.resume_url,
-            "is_placed":s.is_placed
+            "resume_url":s.resume_url
         } for s in students
     ], 200
 
-# is_active -> derived property
+def toggle_blacklist_controller(user_id):
+    user=User.query.get(user_id)
+    if user:
+        user.is_blacklisted=not(user.is_blacklisted)
+        db.session.commit()
+        return {"msg": "BLACKLIST STATUS UPDATED SUCCESSFULLY!"}, 200
+    return abort(400)
+
 def get_placement_drives_controller():
     placement_drives=PlacementDrive.query.all()
-    today=date.today()
     return [
         {
             "id":p.id,
@@ -125,18 +129,18 @@ def get_placement_drives_controller():
             "location":p.location,
             "minimum_cgpa":p.minimum_cgpa,
             "start_date":datetime.strftime(p.start_date,"%d-%m-%Y"),
-            "end_date":datetime.strftime(p.end_date,"%d-%m-%Y"),
-            "is_approved":p.is_approved,
-            "is_active": (p.start_date <= today) and (today <= p.end_date) and (p.is_approved)
+            "end_date":datetime.strftime(p.end_date,"%d-%m-%Y")
         } for p in placement_drives
     ]
 
-def toggle_placement_drive_status_controller(placement_drive_id):
+# to complete -> update end date
+def complete_ongoing_placement_drive_controller(placement_drive_id):
+    today=date.today()
     placement_drive=PlacementDrive.query.get(placement_drive_id)
-    if placement_drive:
-        placement_drive.is_approved=not(placement_drive.is_approved)
+    if placement_drive and placement_drive.end_date >= today:
+        placement_drive.end_date=today-timedelta(days=1)
         db.session.commit()
-        return {"msg": "PLACEMENT DRIVE APPROVED STATUS UPDATED SUCCESSFULLY!"}, 200
+        return {"msg": "PLACEMENT DRIVE COMPLETED SUCCESSFULLY!"}, 200
     return abort(400)
 
 def get_applications_controller():
@@ -147,22 +151,24 @@ def get_applications_controller():
             "student_id": a.student_id,
             "placement_drive_id": a.placement_drive_id,
             "applied_date": datetime.strftime(a.applied_date, "%d-%m-%Y"),
-            "application_status": a.application_status,
-            "student_name": a.student.user.name,
-            "student_email": a.student.user.email,
-            "student_gender": a.student.gender,
-            "student_date_of_birth": datetime.strftime(a.student.date_of_birth,"%d-%m-%Y").date(),
-            "student_department": a.student.department,
-            "student_cgpa": a.student.cgpa,
-            "student_resume_url": a.student.resume_url,
-            "student_is_placed": a.student.is_placed
+            "status": a.status,
+            "interview_date": datetime.strftime(a.interview_date, "%d-%m-%Y") if (a.interview_date) else None,
+            "company_feedback": a.company_feedback,
         } for a in applications
     ], 200
 
-def toggle_blacklist_controller(user_id):
-    user=User.query.get(user_id)
-    if user:
-        user.is_blacklisted=not(user.is_blacklisted)
-        db.session.commit()
-        return {"msg": "BLACKLIST STATUS UPDATED SUCCESSFULLY!"}, 200
+
+def get_student_controller(student_id):
+    student=Student.query.get(student_id)
+    if student:
+        return {
+            "id":student.user.id,
+            "name":student.user.name,
+            "email":student.user.email,
+            "gender":student.gender,
+            "date_of_birth":datetime.strftime(student.date_of_birth, "%d-%m-%Y"),
+            "department":student.department,
+            "cgpa":student.cgpa,
+            "resume_url":student.resume_url
+        }, 200
     return abort(400)
