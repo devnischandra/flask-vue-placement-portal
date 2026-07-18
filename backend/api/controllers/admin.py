@@ -6,10 +6,11 @@ from datetime import datetime, date, timedelta
 
 def search_controller():
     data=request.args
-    user_type=data["user_type"]
-    search_query=data["search_query"]
-    search_value=data["search_value"]
+    user_type=data.get("user_type")
+    search_query=data.get("search_query")
+    search_value=data.get("search_value")
 
+    # User.search_query 
     column=getattr(User,search_query,None)
 
     if [user_type,search_query,search_value] and column is not None:
@@ -76,20 +77,16 @@ def get_companies_controller():
         } for c in companies
     ], 200
 
-def approve_pending_company_controller(company_id):
-    company = Company.query.filter(Company.status=="pending", Company.id==company_id).first()
+def update_company_controller(company_id):
+    company = Company.query.get(company_id)
+    data = request.get_json()
+    
     if company:
-        company.status = "approved"
-        db.session.commit()
-        return {"msg": "COMPANY APPROVED SUCCESSFULLY!"}, 200
-    return abort(400)
+        if "status" in data:
+            company.status = data.get('status')
+            db.session.commit()
 
-def reject_pending_company_controller(company_id):
-    company = Company.query.filter(Company.status=="pending", Company.id==company_id).first()
-    if company:
-        company.status = "rejected"
-        db.session.commit()
-        return {"msg": "COMPANY REJECTED SUCCESSFULLY!"}, 200
+            return {"msg": "COMPANY STATUS UPDATED SUCCESSFULLY!"}, 200
     return abort(400)
 
 def get_students_controller():
@@ -108,12 +105,15 @@ def get_students_controller():
         } for s in students
     ], 200
 
-def toggle_blacklist_controller(user_id):
+def update_user_controller(user_id):
     user=User.query.get(user_id)
+    data=request.get_json()
+
     if user:
-        user.is_blacklisted=not(user.is_blacklisted)
-        db.session.commit()
-        return {"msg": "BLACKLIST STATUS UPDATED SUCCESSFULLY!"}, 200
+        if "is_blacklisted" in data:
+            user.is_blacklisted=not(user.is_blacklisted)
+            db.session.commit()
+            return {"msg": "BLACKLIST STATUS UPDATED SUCCESSFULLY!"}, 200
     return abort(400)
 
 def get_placement_drives_controller():
@@ -134,13 +134,16 @@ def get_placement_drives_controller():
     ]
 
 # to complete -> update end date
-def complete_ongoing_placement_drive_controller(placement_drive_id):
-    today=date.today()
+def update_placement_drive_controller(placement_drive_id):
     placement_drive=PlacementDrive.query.get(placement_drive_id)
-    if placement_drive and placement_drive.end_date >= today:
+    data=request.get_json()
+
+    if placement_drive and "end_date" in data:
+        today=date.today()
         placement_drive.end_date=today-timedelta(days=1)
         db.session.commit()
-        return {"msg": "PLACEMENT DRIVE COMPLETED SUCCESSFULLY!"}, 200
+
+        return {"msg": "PLACEMENT DRIVE UPDATED SUCCESSFULLY!"}, 200
     return abort(400)
 
 def get_applications_controller():

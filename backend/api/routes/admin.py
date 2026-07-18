@@ -3,12 +3,11 @@ from ..controllers.admin import (
     search_controller,
     get_stats_controller,
     get_companies_controller,
-    approve_pending_company_controller,
-    reject_pending_company_controller,
+    update_company_controller,
     get_students_controller,
-    toggle_blacklist_controller,
+    update_user_controller,
     get_placement_drives_controller,
-    complete_ongoing_placement_drive_controller,
+    update_placement_drive_controller,
     get_applications_controller,
     get_student_controller
 )
@@ -18,78 +17,60 @@ from ..guards import require_admin
 
 admin_bp = Blueprint("admin",__name__,url_prefix="/admin")
 
-# search section
-@admin_bp.route("/search")
 # jwt -> required token (authorization)
-@jwt_required()
-def search():
+@admin_bp.before_request
+@jwt_required
+def verify_admin_role():
     require_admin()
+
+# do search
+@admin_bp.route("/search")
+def search():
     return search_controller()
 
-# stats section
+# get stats
 @admin_bp.route("/stats")
-@jwt_required()
 def get_stats():
-    require_admin()
     return get_stats_controller()
 
-# company section
+# get companies
 @admin_bp.route("/companies")
-@jwt_required()
 def get_companies():
-    require_admin()
     return get_companies_controller()
 
-@admin_bp.route("/companies/<int:company_id>/approve-pending-company", methods=["PATCH"])
-@jwt_required()
-def approve_pending_company(company_id):
-    require_admin()
-    return approve_pending_company_controller(company_id)
+# update company (status -> approve, reject)
+@admin_bp.route("/companies/<int:company_id>", methods=["PATCH"])
+def update_company(company_id):
+    return update_company_controller(company_id)
 
-@admin_bp.route("/companies/<int:company_id>/reject-pending-company", methods=["PATCH"])
-@jwt_required()
-def reject_pending_company(company_id):
-    require_admin()
-    return reject_pending_company_controller(company_id)
-
-# student section
+# get students
 @admin_bp.route("/students")
-@jwt_required()
 def get_students():
-    require_admin()
     return get_students_controller()
 
-# blacklist section
-@admin_bp.route("/users/<int:user_id>/toggle-blacklist", methods=["PATCH"])
-@jwt_required()
-def toggle_blacklist(user_id):
-    require_admin()
-    return toggle_blacklist_controller(user_id)
+# update -> user blacklist status
+@admin_bp.route("/users/<int:user_id>", methods=["PATCH"])
+def update_user(user_id):
+    return update_user_controller(user_id)
 
-# placement drive section
+# get placement drives
 @admin_bp.route("/placement-drives")
-@jwt_required()
 def get_placement_drives():
-    require_admin()
     return get_placement_drives_controller()
 
-@admin_bp.route("/placement-drives/<int:placement_drive_id>/complete-ongoing-placement-drive", methods=['PATCH'])
-@jwt_required()
-def complete_ongoing_placement_drive(placement_drive_id):
-    require_admin()
-    return complete_ongoing_placement_drive_controller(placement_drive_id)
+# complete ongoing placement drive
+@admin_bp.route("/placement-drives/<int:placement_drive_id>", methods=['PATCH'])
+def update_placement_drive(placement_drive_id):
+    return update_placement_drive_controller(placement_drive_id)
 
-# appication section
+# get applications
 @admin_bp.route("/applications")
-@jwt_required()
 def get_applications():
-    require_admin()
     return get_applications_controller()
 
+# get student
 @admin_bp.route("/students/<int:student_id>", methods=["GET"])
-@jwt_required()
 def get_student(student_id):
-    require_admin()
     return get_student_controller(student_id)
 
 
