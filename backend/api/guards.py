@@ -1,20 +1,24 @@
 from flask import abort
-from flask_jwt_extended import get_jwt
+from models import User
+from flask_jwt_extended import get_jwt_identity
 
 def require_admin():
-    claims = get_jwt()
-    current_user_role = claims.get("current_user_role")
-    if current_user_role != "admin":
+    id=get_jwt_identity()
+    user=User.query.get(id)
+
+    if user.role != "admin":
         abort(403)
 
 def require_company():
-    claims = get_jwt()
-    current_user_role = claims.get("current_user_role")
-    if current_user_role != "company":
+    id=get_jwt_identity()
+    user=User.query.get(id)
+
+    if user.role != "company" or user.is_blacklisted:
         abort(403)
 
 def require_student():
-    claims = get_jwt()
-    current_user_role = claims.get("current_user_role")
-    if current_user_role != "student":
+    id=get_jwt_identity()
+    user=User.query.get(id)
+
+    if user.role != "student" or user.is_blacklisted:
         abort(403)

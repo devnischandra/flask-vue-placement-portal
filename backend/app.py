@@ -44,6 +44,10 @@ with app.app_context():
 def error_handler_400(e):
     return {"msg":e.name}, 400
 
+@app.errorhandler(403)
+def error_handler_403(e):
+    return {"msg":e.name}, 403
+
 app.register_blueprint(api_bp)
 
 if __name__ == "__main__":

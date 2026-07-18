@@ -13,7 +13,7 @@ def search_controller():
     # User.search_query 
     column=getattr(User,search_query,None)
 
-    if [user_type,search_query,search_value] and column is not None:
+    if user_type and search_query and search_value and column is not None:
 
         companies=Company.query.join(User).filter(User.role=="company",column==search_value).all()
         students=Student.query.join(User).filter(User.role=="student",column==search_value).all()

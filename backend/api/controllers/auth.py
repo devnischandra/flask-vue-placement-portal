@@ -23,10 +23,9 @@ def create_auth_token_controller():
                     return {"msg":"YOUR REQUEST HAS BEEN REJECTED!"}, 403
             
             current_user_id=user.id
-            additional_claims = {"current_user_role":str(user.role)}
-            access_token=create_access_token(str(current_user_id),additional_claims=additional_claims)
+            access_token=create_access_token(str(current_user_id))
             return {
-                    "current_user_role":current_user_role,
+                    "current_user_role":user.role,
                     "token":access_token
             },200
     return abort(400)
@@ -41,7 +40,7 @@ def create_company_controller():
 
     existing_user=User.query.filter_by(email=email).first()
 
-    if [name, email, password] and (not existing_user):
+    if name and email and password and (not existing_user):
         password_hash=bcrypt.generate_password_hash(password).decode("utf-8")
         new_user=User(
             role="company",
@@ -78,7 +77,7 @@ def create_student_controller():
 
     existing_user=User.query.filter_by(email=email).first()
 
-    if [name, email, password] and (not existing_user):
+    if name and email and password (not existing_user):
         password_hash=bcrypt.generate_password_hash(password).decode("utf-8")
         new_user=User(
             name=name,
@@ -88,7 +87,7 @@ def create_student_controller():
         db.session.add(new_user)
         db.session.flush()
 
-        if [gender, date_of_birth, department, cgpa]:
+        if gender and date_of_birth and department and cgpa:
             date_of_birth=datetime.strptime(date_of_birth,"%d-%m-%Y").date()
             new_student=Student(
                 id=new_user.id,

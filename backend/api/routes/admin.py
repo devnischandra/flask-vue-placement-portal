@@ -19,7 +19,7 @@ admin_bp = Blueprint("admin",__name__,url_prefix="/admin")
 
 # jwt -> required token (authorization)
 @admin_bp.before_request
-@jwt_required
+@jwt_required()
 def verify_admin_role():
     require_admin()
 
