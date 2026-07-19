@@ -10,8 +10,8 @@ def search_controller():
     search_query=data.get("search_query")
     search_value=data.get("search_value")
 
-    # User.search_query 
-    column=getattr(User,search_query,None)
+    # User.search_query -> None (when no attribute)
+    column = getattr(User, search_query, None) if search_query else None
 
     if user_type and search_query and search_value and column is not None:
 
@@ -131,7 +131,7 @@ def get_placement_drives_controller():
             "start_date":datetime.strftime(p.start_date,"%d-%m-%Y"),
             "end_date":datetime.strftime(p.end_date,"%d-%m-%Y")
         } for p in placement_drives
-    ]
+    ], 200
 
 # to complete -> update end date
 def update_placement_drive_controller(placement_drive_id):

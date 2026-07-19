@@ -28,7 +28,7 @@ def create_placement_drive():
 def get_placement_drives():
     return get_placement_drives_controller()
 
-# complete ongoing placement drive
+# complete placement drive -> by updating end_date
 @company_bp.route("/placement-drives/<int:placement_drive_id>", methods=['PATCH'])
 def update_placement_drive(placement_drive_id):
     return update_placement_drive_controller(placement_drive_id)

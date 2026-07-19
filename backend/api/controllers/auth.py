@@ -77,7 +77,7 @@ def create_student_controller():
 
     existing_user=User.query.filter_by(email=email).first()
 
-    if name and email and password (not existing_user):
+    if name and email and password and (not existing_user):
         password_hash=bcrypt.generate_password_hash(password).decode("utf-8")
         new_user=User(
             name=name,

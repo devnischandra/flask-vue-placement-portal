@@ -11,7 +11,7 @@ load_dotenv()
 
 app = Flask(__name__)
 
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///placement_portal_app_db"
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("SQLALCHEMY_DATABASE_URI", "sqlite:///placement_portal_app_db")
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
 
 
