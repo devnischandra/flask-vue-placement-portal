@@ -13,11 +13,11 @@
             </div>
             <BaseInput type="url" id="website_url" label="Website URL" v-model="company.website_url"/>
             <!-- submit-btn -->
-            <BaseButton btn-type="primary" label="Submit" />
+            <BaseButton type="submit" btn-class="primary" label="Submit" />
         </form>
         <div class="box mt-3">
             <p>Already have an account ? Click to: <a href="/">Login</a></p>
-            <p>Click to register as: <a href="#/register-student">Student</a></p>
+            <p>Click to register as: <a href="#/register/student">Student</a></p>
         </div>  
     </div>
 

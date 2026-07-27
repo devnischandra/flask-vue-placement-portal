@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 from flask import Flask
+from flask_cors import CORS
 
 from extensions import db, bcrypt, jwt
 from models import User
@@ -10,6 +11,7 @@ from api import api_bp
 load_dotenv()
 
 app = Flask(__name__)
+CORS(app,supports_credentials=True)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("SQLALCHEMY_DATABASE_URI", "sqlite:///placement_portal_app_db")
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")

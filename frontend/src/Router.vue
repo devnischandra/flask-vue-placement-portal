@@ -12,11 +12,11 @@ import StudentDashboard from './pages/StudentDashboard/StudentDashboard.vue';
 
 const routes = {
     '/': Login,
-    '/register-company': RegisterCompany,
-    '/register-student': RegisterStudent,
-    '/admin-dashboard': AdminDashboard,
-    '/company-dashboard': CompanyDashboard,
-    '/student-dashboard': StudentDashboard
+    '/register/company': RegisterCompany,
+    '/register/student': RegisterStudent,
+    '/admin/dashboard': AdminDashboard,
+    '/company/dashboard': CompanyDashboard,
+    '/student/dashboard': StudentDashboard
 }
 
 export default {

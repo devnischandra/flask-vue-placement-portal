@@ -32,11 +32,11 @@
                 </div>
             </div>
             <!-- submit-btn -->
-            <BaseButton btn-type="primary" label="Submit" />
+            <BaseButton type="submit" btn-class="primary" label="Submit" />
         </form>
         <div class="box mt-3">
             <p>Already have an account ? Click to: <a href="/">Login</a></p>
-            <p>Click to register as: <a href="#/register-company">Company</a></p>
+            <p>Click to register as: <a href="#/register/company">Company</a></p>
         </div>  
     </div>
 
