@@ -1,9 +1,10 @@
 <template>
-    <button :type="button" :class="`btn btn-${btnType}`">{{ label }}</button>
+    <button :type="button" @click="$emit('click')" :class="`btn btn-${btnType}`">{{ label }}</button>
 </template>
 
 <script>
 export default{
-    props: ['btnType', 'label']
+    props: ['btnType', 'label'],
+    emits: ['click']
 }
 </script>
