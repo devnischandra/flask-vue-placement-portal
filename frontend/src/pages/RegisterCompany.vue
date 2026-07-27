@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <h1 class="box">Register Company</h1>
-        <form class="box">
+        <form class="box" @submit.prevent="registerCompany">
             <!-- v-model: passing prop (modalValue) + listening to event (update:modalValue) and does the update -->
             <div class="row">
                 <div class="col-6"><BaseInput type="text" id="name" label="Name" v-model="company.name"/></div>
@@ -26,6 +26,7 @@
 <script>
 import BaseInput from '@/components/BaseInput.vue';
 import BaseButton from '@/components/BaseButton.vue';
+import apiRequest from '@/apiRequest';
 
 export default{
     components:{
@@ -40,6 +41,15 @@ export default{
                 password:"",
                 hr_contact:"",
                 website_url:""
+            }
+        }
+    },
+    methods:{
+        async registerCompany(){
+            const payload = this.company
+            const data = await apiRequest('/auth/companies','POST',payload)
+            if (data.msg){
+                console.log(data.msg)
             }
         }
     }

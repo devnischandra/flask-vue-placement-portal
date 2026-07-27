@@ -88,7 +88,7 @@ def create_student_controller():
         db.session.flush()
 
         if gender and date_of_birth and department and cgpa:
-            date_of_birth=datetime.strptime(date_of_birth,"%d-%m-%Y").date()
+            date_of_birth=datetime.strptime(date_of_birth,"%Y-%m-%d").date()
             new_student=Student(
                 id=new_user.id,
                 gender=gender,

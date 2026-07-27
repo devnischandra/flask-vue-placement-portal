@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <h1 class="box">Register Student</h1>
-        <form class="box">
+        <form class="box" @submit.prevent="registerStudent">
             <!-- v-model: passing prop (modalValue) + listening to event (update:modalValue) and does the update -->
             <div class="row">
                 <div class="col-6"><BaseInput type="text" id="name" label="Name" v-model="student.name"/></div>
@@ -45,6 +45,7 @@
 <script>
 import BaseInput from '@/components/BaseInput.vue';
 import BaseButton from '@/components/BaseButton.vue';
+import apiRequest from '@/apiRequest';
 
 export default{
     components:{
@@ -62,6 +63,15 @@ export default{
                 department:"",
                 cgpa:"",
                 resume_url:""
+            }
+        }
+    },
+    methods:{
+        async registerStudent(){
+            const payload = this.student
+            const data = await apiRequest('/auth/students','POST',payload)
+            if (data.msg){
+                console.log(data.msg)
             }
         }
     }
