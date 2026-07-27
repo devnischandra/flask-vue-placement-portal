@@ -383,4 +383,7 @@ __screenshots__/
 # Vite
 *.timestamp-*-*.mjs
 
+# learnings
+.learnings.txt
+
 # End

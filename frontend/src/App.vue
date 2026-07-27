@@ -1,3 +1,13 @@
 <template>
-  <h1>i'm app.vue</h1>
+  <Router />
 </template>
+
+<script>
+import Router from './Router.vue';
+
+export default{
+  components:{
+    Router
+  }
+}
+</script>
