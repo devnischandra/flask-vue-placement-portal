@@ -2,7 +2,7 @@ from flask import request, abort
 from extensions import db, bcrypt
 from models import User, Company, Student
 
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, get_jwt_identity
 
 from datetime import datetime
 
@@ -103,4 +103,14 @@ def create_student_controller():
             return{
                 "msg":"STUDENT REGISTERED SUCCESSFULLY!"
             },200
+    return abort(400)
+
+def get_me_controller():
+    current_user_id = get_jwt_identity()
+    current_user = User.query.get(current_user_id)
+    if current_user:
+        return {
+            'current_user_name': current_user.name
+        }, 200
+
     return abort(400)

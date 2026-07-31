@@ -4,52 +4,6 @@ from models import User, Company, Student, PlacementDrive, Application
 
 from datetime import datetime, date, timedelta
 
-def search_controller():
-    data=request.args
-    user_type=data.get("user_type")
-    search_query=data.get("search_query")
-    search_value=data.get("search_value")
-
-    # User.search_query -> None (when no attribute)
-    column = getattr(User, search_query, None) if search_query else None
-
-    if user_type and search_query and search_value and column is not None:
-
-        companies=Company.query.join(User).filter(User.role=="company",column==search_value).all()
-        students=Student.query.join(User).filter(User.role=="student",column==search_value).all()
-
-        if user_type=="company" and companies:
-            return [
-                {
-                    "id":c.user.id,
-                    "name":c.user.name,
-                    "email":c.user.email,
-                    "is_blacklisted":c.user.is_blacklisted,
-                    "hr_contact":c.hr_contact,
-                    "website_url":c.website_url,
-                    "status":c.status
-                } for c in companies
-            ], 200
-
-        if user_type=="student" and students:
-            return [
-                {
-                    "id":s.user.id,
-                    "name":s.user.name,
-                    "email":s.user.email,
-                    "is_blacklisted":s.user.is_blacklisted,
-                    "gender":s.gender,
-                    "date_of_birth":datetime.strftime(s.date_of_birth, "%d-%m-%Y"),
-                    "department":s.department,
-                    "cgpa":s.cgpa,
-                    "resume_url":s.resume_url
-                } for s in students
-            ], 200
-            
-        return {"msg": "NOT FOUND"}, 404
-    
-    return abort(400)
-
 def get_stats_controller():
     total_companies_count = Company.query.count()
     total_students_count = Student.query.count()
@@ -98,9 +52,9 @@ def get_students_controller():
             "email":s.user.email,
             "is_blacklisted":s.user.is_blacklisted,
             "gender":s.gender,
-            "date_of_birth":datetime.strftime(s.date_of_birth, "%d-%m-%Y"),
+            "date_of_birth":datetime.strftime(s.date_of_birth, "%Y-%m-%d"),
             "department":s.department,
-            "cgpa":s.cgpa,
+            "cgpa":float(s.cgpa),
             "resume_url":s.resume_url
         } for s in students
     ], 200
@@ -128,8 +82,8 @@ def get_placement_drives_controller():
             "job_mode":p.job_mode,
             "location":p.location,
             "minimum_cgpa":p.minimum_cgpa,
-            "start_date":datetime.strftime(p.start_date,"%d-%m-%Y"),
-            "end_date":datetime.strftime(p.end_date,"%d-%m-%Y")
+            "start_date":datetime.strftime(p.start_date,"%Y-%m-%d"),
+            "end_date":datetime.strftime(p.end_date,"%Y-%m-%d")
         } for p in placement_drives
     ], 200
 
@@ -153,9 +107,9 @@ def get_applications_controller():
             "id": a.id,
             "student_id": a.student_id,
             "placement_drive_id": a.placement_drive_id,
-            "applied_date": datetime.strftime(a.applied_date, "%d-%m-%Y"),
+            "applied_date": datetime.strftime(a.applied_date, "%Y-%m-%d"),
             "status": a.status,
-            "interview_date": datetime.strftime(a.interview_date, "%d-%m-%Y") if (a.interview_date) else None,
+            "interview_date": datetime.strftime(a.interview_date, "%Y-%m-%d") if (a.interview_date) else None,
             "company_feedback": a.company_feedback,
         } for a in applications
     ], 200
@@ -169,9 +123,9 @@ def get_student_controller(student_id):
             "name":student.user.name,
             "email":student.user.email,
             "gender":student.gender,
-            "date_of_birth":datetime.strftime(student.date_of_birth, "%d-%m-%Y"),
+            "date_of_birth":datetime.strftime(student.date_of_birth, "%Y-%m-%d"),
             "department":student.department,
-            "cgpa":student.cgpa,
+            "cgpa":float(student.cgpa),
             "resume_url":student.resume_url
         }, 200
     return abort(400)

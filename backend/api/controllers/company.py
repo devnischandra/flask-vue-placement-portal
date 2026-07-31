@@ -28,8 +28,8 @@ def create_placement_drive_controller():
         job_mode=job_mode,
         location=location,
         minimum_cgpa=minimum_cgpa,
-        start_date=datetime.strptime(start_date, "%d-%m-%Y").date(),
-        end_date=datetime.strptime(end_date, "%d-%m-%Y").date()
+        start_date=datetime.strptime(start_date, "%Y-%m-%d").date(),
+        end_date=datetime.strptime(end_date, "%Y-%m-%d").date()
         )
 
         db.session.add(new_placement_drive)
@@ -52,8 +52,8 @@ def get_placement_drives_controller():
             "job_mode":p.job_mode,
             "location":p.location,
             "minimum_cgpa":p.minimum_cgpa,
-            "start_date":datetime.strftime(p.start_date, '%d-%m-%Y'),
-            "end_date":datetime.strftime(p.end_date, '%d-%m-%Y')
+            "start_date":datetime.strftime(p.start_date, '%Y-%m-%d'),
+            "end_date":datetime.strftime(p.end_date, '%Y-%m-%d')
         } for p in placement_drives
     ]
 
@@ -79,9 +79,9 @@ def get_placement_drive_applications_controller(placement_drive_id):
             "id":a.id,
             "student_id":a.student_id,
             "placement_drive_id":a.placement_drive_id,
-            "applied_date":datetime.strftime(a.applied_date, '%d-%m-%Y'),
+            "applied_date":datetime.strftime(a.applied_date, '%Y-%m-%d'),
             "status":a.status,
-            "interview_date":datetime.strftime(a.interview_date, '%d-%m-%Y') if (a.interview_date) else None,
+            "interview_date":datetime.strftime(a.interview_date, '%Y-%m-%d') if (a.interview_date) else None,
             "company_feedback":a.company_feedback,
         } for a in applications
     ], 200
@@ -96,7 +96,7 @@ def get_application_controller(application_id):
             "student_name":application.student.user.name,
             "student_email":application.student.user.email,
             "student_gender":application.student.gender,
-            "student_date_of_birth":datetime.strftime(application.student.date_of_birth, '%d-%m-%Y'),
+            "student_date_of_birth":datetime.strftime(application.student.date_of_birth, '%Y-%m-%d'),
             "student_department":application.student.department,
             "student_cgpa":application.student.cgpa,
             "student_resume_url":application.student.resume_url,
@@ -119,7 +119,7 @@ def update_application_controller(application_id):
             return{'msg': 'APPLICATION STATUS UPDATED SUCCESSFULLY'}, 200
         if 'interview_date' in data:
             interview_date = data.get('interview_date')
-            application.interview_date= datetime.strptime(interview_date, '%d-%m-%Y').date()
+            application.interview_date= datetime.strptime(interview_date, '%Y-%m-%d').date()
             db.session.commit()
             return{'msg': 'INTERVIEW DATE UPDATED SUCCESSFULLY'}, 200
         if 'company_feedback' in data:

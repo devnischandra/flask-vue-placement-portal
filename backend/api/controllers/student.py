@@ -56,8 +56,8 @@ def get_company_placement_drives_controller(company_id):
             "job_mode":p.job_mode,
             "location":p.location,
             "minimum_cgpa":p.minimum_cgpa,
-            "start_date":datetime.strftime(p.start_date,"%d-%m-%Y"),
-            "end_date":datetime.strftime(p.end_date,"%d-%m-%Y")
+            "start_date":datetime.strftime(p.start_date,"%Y-%m-%d"),
+            "end_date":datetime.strftime(p.end_date,"%Y-%m-%d")
         } for p in placement_drives
     ], 200
 
@@ -86,9 +86,9 @@ def get_applications_controller():
             "id": a.id,
             "company_name": a.placement_drive.company.user.name,
             "job_title": a.placement_drive.job_title,
-            "applied_date": datetime.strftime(a.applied_date, "%d-%m-%Y"),
+            "applied_date": datetime.strftime(a.applied_date, "%Y-%m-%d"),
             "status": a.status,
-            "interview_date": datetime.strftime(a.interview_date, "%d-%m-%Y") if (a.interview_date) else None,
+            "interview_date": datetime.strftime(a.interview_date, "%Y-%m-%d") if (a.interview_date) else None,
             "company_feedback": a.company_feedback,
         } for a in applications
     ], 200

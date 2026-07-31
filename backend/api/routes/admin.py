@@ -1,6 +1,5 @@
 from flask import Blueprint
 from ..controllers.admin import (
-    search_controller,
     get_stats_controller,
     get_companies_controller,
     update_company_controller,
@@ -22,11 +21,6 @@ admin_bp = Blueprint("admin",__name__,url_prefix="/admin")
 @jwt_required()
 def verify_admin_role():
     require_admin()
-
-# do search
-@admin_bp.route("/search")
-def search():
-    return search_controller()
 
 # get stats
 @admin_bp.route("/stats")

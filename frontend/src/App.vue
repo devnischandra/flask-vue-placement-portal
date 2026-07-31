@@ -11,3 +11,10 @@ export default{
   }
 }
 </script>
+
+<style>
+.box-border {
+    border: 1px, solid, black;
+    padding: 0.75rem;
+}
+</style>
