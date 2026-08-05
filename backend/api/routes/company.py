@@ -3,8 +3,8 @@ from ..controllers.company import (
     create_placement_drive_controller,
     get_placement_drives_controller,
     update_placement_drive_controller,
-    get_placement_drive_applications_controller,
-    get_application_controller,
+    get_applications_controller,
+    get_student_controller,
     update_application_controller
 )
 
@@ -28,20 +28,20 @@ def create_placement_drive():
 def get_placement_drives():
     return get_placement_drives_controller()
 
-# complete placement drive -> by updating end_date
+# mark as complete placement drive -> by updating end_date
 @company_bp.route("/placement-drives/<int:placement_drive_id>", methods=['PATCH'])
 def update_placement_drive(placement_drive_id):
     return update_placement_drive_controller(placement_drive_id)
 
-# get placement drive -> applications
-@company_bp.route("/placement-drives/<int:placement_drive_id>/applications", methods=['GET'])
-def get_placement_drive_applications(placement_drive_id):
-    return get_placement_drive_applications_controller(placement_drive_id)
+# get -> applications
+@company_bp.route("/applications", methods=['GET'])
+def get_applications():
+    return get_applications_controller()
 
-# get application
-@company_bp.route("/applications/<int:application_id>", methods=['GET'])
-def get_application(application_id):
-    return get_application_controller(application_id)
+# get student
+@company_bp.route("/students/<int:student_id>", methods=['GET'])
+def get_student(student_id):
+    return get_student_controller(student_id)
 
 # update (status, interview_date, company_feedback)
 @company_bp.route("/applications/<int:application_id>", methods=['PATCH'])

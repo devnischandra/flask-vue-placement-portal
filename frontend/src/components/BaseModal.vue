@@ -23,6 +23,6 @@
 
 <script>
 export default{
-    props:['id','modal-title','is-modal-btn-label','modal-btn-label']
+    props:['id','modal-title']
 }
 </script>

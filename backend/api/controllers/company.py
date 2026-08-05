@@ -1,6 +1,6 @@
 from flask import request, abort
 from extensions import db
-from models import Company, PlacementDrive, Application
+from models import Company, PlacementDrive, Application, Student
 
 from flask_jwt_extended import get_jwt_identity
 from datetime import datetime, date, timedelta
@@ -71,9 +71,9 @@ def update_placement_drive_controller(placement_drive_id):
     return abort(400)
 
 
-def get_placement_drive_applications_controller(placement_drive_id):
+def get_applications_controller():
     company_id = get_jwt_identity()
-    applications=Application.query.join(PlacementDrive).filter(PlacementDrive.company_id==company_id, Application.placement_drive_id==placement_drive_id).all()
+    applications=Application.query.join(PlacementDrive).filter(PlacementDrive.company_id==company_id).all()
     return[
         {
             "id":a.id,
@@ -81,27 +81,23 @@ def get_placement_drive_applications_controller(placement_drive_id):
             "placement_drive_id":a.placement_drive_id,
             "applied_date":datetime.strftime(a.applied_date, '%Y-%m-%d'),
             "status":a.status,
-            "interview_date":datetime.strftime(a.interview_date, '%Y-%m-%d') if (a.interview_date) else None,
+            "interview_date":datetime.strftime(a.interview_date, '%Y-%m-%d') if (a.interview_date) else False,
             "company_feedback":a.company_feedback,
         } for a in applications
     ], 200
 
-def get_application_controller(application_id):
-    company_id = get_jwt_identity()
-    application=Application.query.join(PlacementDrive).filter(PlacementDrive.company_id==company_id, Application.id==application_id).first()
-    if application:
+def get_student_controller(student_id):
+    student=Student.query.get(student_id)
+    if student:
         return {
-            "id":application.id,
-            "student_id":application.student_id,
-            "student_name":application.student.user.name,
-            "student_email":application.student.user.email,
-            "student_gender":application.student.gender,
-            "student_date_of_birth":datetime.strftime(application.student.date_of_birth, '%Y-%m-%d'),
-            "student_department":application.student.department,
-            "student_cgpa":application.student.cgpa,
-            "student_resume_url":application.student.resume_url,
-            "status":application.status,
-            "company_feedback":application.company_feedback
+            "id":student.id,
+            "name":student.user.name,
+            "email":student.user.email,
+            "gender":student.gender,
+            "date_of_birth":datetime.strftime(student.date_of_birth, '%Y-%m-%d'),
+            "department":student.department,
+            "cgpa":student.cgpa,
+            "resume_url":student.resume_url
         }
     return abort(400)
     
@@ -116,14 +112,12 @@ def update_application_controller(application_id):
         if "status" in data:
             application.status=data.get('status')
             db.session.commit()
-            return{'msg': 'APPLICATION STATUS UPDATED SUCCESSFULLY'}, 200
         if 'interview_date' in data:
             interview_date = data.get('interview_date')
             application.interview_date= datetime.strptime(interview_date, '%Y-%m-%d').date()
             db.session.commit()
-            return{'msg': 'INTERVIEW DATE UPDATED SUCCESSFULLY'}, 200
         if 'company_feedback' in data:
             application.company_feedback=data.get('company_feedback')
             db.session.commit()
-            return{'msg': 'COMPANY FEEDBACK UPDATED SUCCESSFULLY'}, 200
+        return{'msg': 'COMPANY FEEDBACK UPDATED SUCCESSFULLY'}, 200
     return abort(400)

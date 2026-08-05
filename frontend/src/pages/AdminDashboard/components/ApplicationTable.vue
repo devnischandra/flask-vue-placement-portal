@@ -25,7 +25,7 @@
                     <BaseModal
                     :id="`application-${application.id}`"
                     :modal-title="`Student Application #${application.id}`"
-                    :is-modal-btn-label="false" >
+                    >
                     <h5>Application Details</h5>
                         <p>Application ID: {{application.id}}</p>
                         <p>Applied Date: {{application.applied_date}}</p>

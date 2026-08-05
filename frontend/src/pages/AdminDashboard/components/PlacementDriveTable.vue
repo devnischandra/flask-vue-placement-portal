@@ -24,7 +24,7 @@
                     <BaseModal
                     :id="`placement_drive-${placement_drive.id}`"
                     :modal-title="`Placement Drive #${placement_drive.id}`"
-                    :is-modal-btn-label="false" >
+                    >
                     <h5>Company Details</h5>
                         <p>Company ID: {{placement_drive.company_id}}</p>
                         <p>Company Name: {{placement_drive.company_name}}</p>
