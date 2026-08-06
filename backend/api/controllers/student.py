@@ -5,49 +5,71 @@ from models import User, Company, Student, PlacementDrive, Application
 from flask_jwt_extended import get_jwt_identity
 from datetime import datetime, date
 
+def get_me_controller():
+    student_id=get_jwt_identity()
+    student=Student.query.get(student_id)
+    if student:
+        return{
+            "name":student.user.name,
+            "email":student.user.email,
+            "cgpa":student.cgpa,
+            "resume_url":student.resume_url
+        }
+    return abort(400)
+
 def update_student_controller():
     student_id=get_jwt_identity()
-    student=Student.query.join(User).filter(User.id==student_id).first()
+    student=Student.query.get(student_id)
     data=request.get_json()
 
     if student:
         if 'email' in data:
             email= data.get('email')
-            existing_user = User.query.filter_by(email=email).first()
+            existing_user = User.query.filter(
+                User.id != student_id,
+                User.email == email
+            ).first()
             if existing_user:
                 return {'msg': 'EMAIL ALREADY IN USE!'}, 409
             else:
                 student.user.email = email
                 db.session.commit()
-                return {'msg': 'EMAIL UPDATED SUCCESSFULLY!'}, 200
         
         if 'cgpa' in data:
             student.cgpa = data.get('cgpa')
             db.session.commit()
-            return {'msg': 'CGPA UPDATED SUCCESSFULLY!'}
         
         if 'resume_url' in data:
             student.resume_url = data.get('resume_url')
             db.session.commit()
-            return {'msg': 'RESUME UPDATED SUCCESSFULLY!'}
+        return {'msg': 'STUDENT PROFILE UPDATED SUCCESSFULLY!'}
     return abort(400)
         
 def get_companies_controller():
-    companies = Company.query.all()
+    companies = Company.query.join(User).filter(User.is_blacklisted==False,Company.status=="approved").all()
     return [
         {
             "id":c.user.id,
             "name":c.user.name,
             "email":c.user.email,
-            "is_blacklisted":c.user.is_blacklisted,
             "hr_contact":c.hr_contact,
-            "website_url":c.website_url,
-            "status":c.status
+            "website_url":c.website_url
         } for c in companies
     ], 200
 
-def get_company_placement_drives_controller(company_id):
-    placement_drives = PlacementDrive.query.filter_by(company_id=company_id).all()
+def get_placement_drives_controller():
+    student_id = get_jwt_identity()
+
+    placement_drives = (
+        PlacementDrive.query
+        .join(Company, PlacementDrive.company_id == Company.id)
+        .join(User)
+        .filter(
+            User.is_blacklisted == False,
+            Company.status == "approved"
+        ).all()
+    )
+
     return [
         {
             "id":p.id,
@@ -57,16 +79,22 @@ def get_company_placement_drives_controller(company_id):
             "location":p.location,
             "minimum_cgpa":p.minimum_cgpa,
             "start_date":datetime.strftime(p.start_date,"%Y-%m-%d"),
-            "end_date":datetime.strftime(p.end_date,"%Y-%m-%d")
+            "end_date":datetime.strftime(p.end_date,"%Y-%m-%d"),
+            "has_applied": any(
+                a.student_id == int(student_id)
+                for a in p.applications
+            )
         } for p in placement_drives
     ], 200
 
-def create_application_controller(placement_drive_id):
+def create_application_controller():
     student_id=get_jwt_identity()
     student=Student.query.get(student_id)
-    placement_drive=PlacementDrive.query.get(placement_drive_id)
+    
+    data=request.get_json()
+    placement_drive_id=data.get("placement_drive_id")
 
-    if student and float(student.cgpa) >= placement_drive.minimum_cgpa:
+    if student:
         new_application=Application(
             student_id=student_id,
             placement_drive_id=placement_drive_id,
@@ -84,9 +112,12 @@ def get_applications_controller():
     return[
         {
             "id": a.id,
+            "placement_drive_id": a.placement_drive_id,
             "company_name": a.placement_drive.company.user.name,
             "job_title": a.placement_drive.job_title,
             "applied_date": datetime.strftime(a.applied_date, "%Y-%m-%d"),
+            "placement_drive_start_date":datetime.strftime(a.placement_drive.start_date, "%Y-%m-%d"),
+            "placement_drive_end_date": datetime.strftime(a.placement_drive.end_date, "%Y-%m-%d"),
             "status": a.status,
             "interview_date": datetime.strftime(a.interview_date, "%Y-%m-%d") if (a.interview_date) else None,
             "company_feedback": a.company_feedback,

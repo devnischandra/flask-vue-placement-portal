@@ -69,6 +69,6 @@ class Application(db.Model):
     student_id=db.Column(db.Integer, db.ForeignKey("students.id"), nullable=False)
     placement_drive_id=db.Column(db.Integer, db.ForeignKey("placement_drives.id"), nullable=False)
     applied_date =db.Column(db.Date, nullable=False)
-    status = db.Column(APPLICATION_STATUS_ENUM, nullable=False, default="applied")
+    status = db.Column(APPLICATION_STATUS_ENUM, nullable=True, default="applied")
     interview_date = db.Column(db.Date, nullable=True)
     company_feedback=db.Column(db.Text, nullable=True)
