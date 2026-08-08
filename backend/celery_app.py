@@ -8,16 +8,25 @@ from celery.schedules import crontab
 celery = Celery(
     "placement_portal",
     broker=os.getenv("REDIS_URL", "redis://127.0.0.1:6379/0"),
-    backend=os.getenv("REDIS_URL", "redis://127.0.0.1:6379/0")
+    backend=os.getenv("REDIS_URL", "redis://127.0.0.1:6379/0"),
+    include=[
+        "tasks.interview_tasks",
+        "tasks.report_tasks"
+    ]
 )
-
-from tasks.interview_tasks import send_interview_reminders
 
 celery.conf.beat_schedule = {
     "send-interview-reminders-daily": {
         "task": "tasks.interview_tasks.send_interview_reminders",
         "schedule": crontab(hour=9,minute=0)
     },
+}
+
+celery.conf.beat_schedule = {
+    "generate-company-monthly-report": {
+        "task": "tasks.report_tasks.generate_company_monthly_report",
+        "schedule": crontab(minute='*')
+    }
 }
 
 # @celery.task
