@@ -4,7 +4,7 @@ USER_ROLE_ENUM = db.Enum("admin","company","student")
 COMPANY_STATUS_ENUM = db.Enum("pending","approved","rejected")
 STUDENT_GENDER_ENUM = db.Enum("male","female","other")
 JOB_MODE_ENUM = db.Enum("office","remote","hybrid")
-APPLICATION_STATUS_ENUM = db.Enum("applied", "shortlisted", "selected", "rejected")
+APPLICATION_STATUS_ENUM = db.Enum("applied", "shortlisted", "selected", "rejected", 'cancelled')
 
 # users -> (admin, company, student)
 class User(db.Model):

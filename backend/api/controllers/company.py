@@ -47,6 +47,7 @@ def get_placement_drives_controller():
     return[
         {
             "id":p.id,
+            "is_blacklisted": p.company.user.is_blacklisted,
             "job_title":p.job_title,
             "description":p.description,
             "job_mode":p.job_mode,

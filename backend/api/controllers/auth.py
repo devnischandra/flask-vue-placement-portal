@@ -6,6 +6,7 @@ from flask_jwt_extended import create_access_token, get_jwt_identity
 
 from datetime import datetime
 
+# login -> user not blacklisted and company is approved
 def create_auth_token_controller():
     data=request.get_json()
     email=data.get('email')

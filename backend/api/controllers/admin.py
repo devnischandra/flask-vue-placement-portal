@@ -5,7 +5,7 @@ from models import User, Company, Student, PlacementDrive, Application
 from datetime import datetime, date, timedelta
 
 def get_stats_controller():
-    total_companies_count = Company.query.count()
+    total_companies_count = Company.query.filter(Company.status!='rejected').count()
     total_students_count = Student.query.count()
     total_placement_drives_count = PlacementDrive.query.count()
     total_applications_count = Application.query.count()
@@ -66,8 +66,24 @@ def update_user_controller(user_id):
     if user:
         if "is_blacklisted" in data:
             user.is_blacklisted=not(user.is_blacklisted)
+
+            if user.is_blacklisted:
+                if (user.role == 'student'):
+                    for application in user.student.applications:
+                        if application.status in ['applied','shortlisted']:
+                            application.status = 'cancelled'
+
+                elif user.role == "company":
+                    for drive in user.company.placement_drives:
+                        today = date.today()
+                        drive.end_date = today - timedelta(days=1)
+                        for application in drive.applications:
+                            if application.status in ["applied", "shortlisted"]:
+                                application.status = "cancelled"
+                
             db.session.commit()
             return {"msg": "BLACKLIST STATUS UPDATED SUCCESSFULLY!"}, 200
+
     return abort(400)
 
 def get_placement_drives_controller():

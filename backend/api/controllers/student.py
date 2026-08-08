@@ -93,8 +93,16 @@ def create_application_controller():
     
     data=request.get_json()
     placement_drive_id=data.get("placement_drive_id")
+    placement_drive=PlacementDrive.query.get(placement_drive_id)
 
-    if student:
+    if not student or not placement_drive:
+        return abort(400)
+
+    today = date.today()
+    is_active = today >= placement_drive.start_date and today <= placement_drive.end_date
+    existing_application = Application.query.filter_by(placement_drive_id=placement_drive_id,student_id=student_id).first()
+
+    if is_active and not existing_application:
         new_application=Application(
             student_id=student_id,
             placement_drive_id=placement_drive_id,

@@ -119,6 +119,8 @@ export default{
         async updateCompany(company_id, update){
             const data = await apiRequest(`/admin/companies/${company_id}`, 'PATCH', update)
             this.getCompanies()
+            this.getStats()
+            this.getPlacementDrives()
             if (data.msg){
                 console.log(data.msg)
             }

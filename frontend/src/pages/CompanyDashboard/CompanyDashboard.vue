@@ -87,9 +87,13 @@ export default{
             const data = await apiRequest('/auth/me', 'GET')
             this.current_user_name = data.current_user_name
         },
+        async createPlacementDrive(new_placement_drive){
+            const data = await apiRequest('/company/placement-drives','POST', new_placement_drive)
+            this.getPlacementDrives()
+        },
         async getPlacementDrives(){
             const data = await apiRequest('/company/placement-drives','GET')
-            this.placement_drives = data
+            this.placement_drives = data.filter(pd => !pd.is_blacklisted)
         },
         async getPlacementDrive(placement_drive_id){
             const placement_drive = await apiRequest(`/company/placement-drives/${placement_drive_id}`,'GET')
