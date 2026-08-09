@@ -5,6 +5,8 @@ from models import Company, PlacementDrive, Application, Student
 from flask_jwt_extended import get_jwt_identity
 from datetime import datetime, date, timedelta
 
+from tasks.export_csv_tasks import company_applications
+
 # create drive section
 def create_placement_drive_controller():
     company_id = get_jwt_identity()
@@ -122,3 +124,12 @@ def update_application_controller(application_id):
             db.session.commit()
         return{'msg': 'COMPANY FEEDBACK UPDATED SUCCESSFULLY'}, 200
     return abort(400)
+
+def export_applications_controller():
+    company_id = get_jwt_identity()
+    task = company_applications.delay(company_id)
+
+    return{
+        'msg': 'EXPORT STARTED!',
+        'id': task.id
+    }, 202

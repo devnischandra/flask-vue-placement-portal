@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from flask import Flask
+from flask import Flask, send_from_directory
 from flask_cors import CORS
 
 from extensions import db, bcrypt, jwt, mail
@@ -57,6 +57,10 @@ def error_handler_400(e):
 @app.errorhandler(403)
 def error_handler_403(e):
     return {"msg":e.name}, 403
+
+@app.route("/<filename>")
+def download_file(filename):
+    return send_from_directory(".", filename, as_attachment=True)
 
 app.register_blueprint(api_bp)
 

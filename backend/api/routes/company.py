@@ -5,7 +5,8 @@ from ..controllers.company import (
     update_placement_drive_controller,
     get_applications_controller,
     get_student_controller,
-    update_application_controller
+    update_application_controller,
+    export_applications_controller
 )
 
 from flask_jwt_extended import jwt_required
@@ -47,5 +48,9 @@ def get_student(student_id):
 @company_bp.route("/applications/<int:application_id>", methods=['PATCH'])
 def update_application(application_id):
     return update_application_controller(application_id)
+
+@company_bp.route("/export-applications", methods=["POST"])
+def export_applications():
+    return export_applications_controller()
 
 

@@ -5,6 +5,8 @@ from models import User, Company, Student, PlacementDrive, Application
 from flask_jwt_extended import get_jwt_identity
 from datetime import datetime, date
 
+from tasks.export_csv_tasks import student_applications
+
 def get_me_controller():
     student_id=get_jwt_identity()
     student=Student.query.get(student_id)
@@ -131,3 +133,12 @@ def get_applications_controller():
             "company_feedback": a.company_feedback,
         } for a in applications
     ], 200
+
+def export_applications_controller():
+    student_id = get_jwt_identity()
+    task = student_applications.delay(student_id)
+
+    return{
+        'msg': 'EXPORT STARTED!',
+        'id': task.id
+    }, 202

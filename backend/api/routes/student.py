@@ -5,7 +5,8 @@ from ..controllers.student import(
     get_companies_controller,
     get_placement_drives_controller,
     create_application_controller,
-    get_applications_controller
+    get_applications_controller,
+    export_applications_controller
 )
 
 from flask_jwt_extended import jwt_required
@@ -46,3 +47,7 @@ def create_application():
 @student_bp.route('/applications', methods=['GET'])
 def get_applications():
     return get_applications_controller()
+
+@student_bp.route("/export-applications", methods=["POST"])
+def export_applications():
+    return export_applications_controller()

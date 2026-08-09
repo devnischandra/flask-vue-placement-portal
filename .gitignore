@@ -385,5 +385,6 @@ __screenshots__/
 
 # learnings
 .learnings.txt
+backend/*.csv
 
 # End
