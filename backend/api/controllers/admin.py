@@ -1,8 +1,9 @@
 from flask import request, abort
-from extensions import db
+from extensions import db, cache
 from models import User, Company, Student, PlacementDrive, Application
 
 from datetime import datetime, date, timedelta
+from api.controllers.company import get_placement_drives_controller
 
 def get_stats_controller():
     total_companies_count = Company.query.filter(Company.status!='rejected').count()
@@ -39,6 +40,9 @@ def update_company_controller(company_id):
         if "status" in data:
             company.status = data.get('status')
             db.session.commit()
+
+            cache.delete("admin_companies")
+            cache.delete("companies")
 
             return {"msg": "COMPANY STATUS UPDATED SUCCESSFULLY!"}, 200
     return abort(400)
@@ -82,6 +86,11 @@ def update_user_controller(user_id):
                                 application.status = "cancelled"
                 
             db.session.commit()
+
+            cache.delete("admin_companies")
+            cache.delete("admin_students")
+            cache.delete("companies")
+
             return {"msg": "BLACKLIST STATUS UPDATED SUCCESSFULLY!"}, 200
 
     return abort(400)
@@ -109,9 +118,16 @@ def update_placement_drive_controller(placement_drive_id):
     data=request.get_json()
 
     if placement_drive and "end_date" in data:
+        company_id = placement_drive.company.id
         today=date.today()
         placement_drive.end_date=today-timedelta(days=1)
         db.session.commit()
+
+        cache.delete("admin_placement_drives")
+        cache.delete_memoized(
+            get_placement_drives_controller,
+            company_id
+        )
 
         return {"msg": "PLACEMENT DRIVE UPDATED SUCCESSFULLY!"}, 200
     return abort(400)

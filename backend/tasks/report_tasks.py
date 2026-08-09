@@ -35,6 +35,7 @@ def generate_company_monthly_report():
                 f.write(report)
 
             print(f"Report generated: {filename}")
+            # upgrade -> sent reports on mail
         return len(companies)
             
 

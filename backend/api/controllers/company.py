@@ -1,5 +1,5 @@
 from flask import request, abort
-from extensions import db
+from extensions import db, cache
 from models import Company, PlacementDrive, Application, Student
 
 from flask_jwt_extended import get_jwt_identity
@@ -36,6 +36,7 @@ def create_placement_drive_controller():
 
         db.session.add(new_placement_drive)
         db.session.commit()
+        cache.delete_memoized(get_placement_drives_controller, int(company_id))
         return{"msg":"PLACEMENT DRIVE CREATED SUCCESSFULLY"}, 200
     return abort(400)
     
@@ -43,8 +44,8 @@ def create_placement_drive_controller():
 
 
 # get placement drives
-def get_placement_drives_controller():
-    company_id = get_jwt_identity()
+@cache.memoize()
+def get_placement_drives_controller(company_id):
     placement_drives=PlacementDrive.query.filter_by(company_id=company_id).all()
     return[
         {
@@ -69,13 +70,11 @@ def update_placement_drive_controller(placement_drive_id):
         today=date.today()
         placement_drive.end_date=today-timedelta(days=1)
         db.session.commit()
-
+        cache.delete_memoized(get_placement_drives_controller, int(company_id))
         return {"msg": "PLACEMENT DRIVE UPDATED SUCCESSFULLY!"}, 200
     return abort(400)
 
-
-def get_applications_controller():
-    company_id = get_jwt_identity()
+def get_applications_controller(company_id):
     applications=Application.query.join(PlacementDrive).filter(PlacementDrive.company_id==company_id).all()
     return[
         {

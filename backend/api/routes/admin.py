@@ -13,6 +13,7 @@ from ..controllers.admin import (
 
 from flask_jwt_extended import jwt_required
 from ..guards import require_admin
+from extensions import cache
 
 admin_bp = Blueprint("admin",__name__,url_prefix="/admin")
 
@@ -29,6 +30,7 @@ def get_stats():
 
 # get companies
 @admin_bp.route("/companies")
+@cache.cached(key_prefix="admin_companies")
 def get_companies():
     return get_companies_controller()
 
@@ -39,6 +41,7 @@ def update_company(company_id):
 
 # get students
 @admin_bp.route("/students")
+@cache.cached(key_prefix="admin_students")
 def get_students():
     return get_students_controller()
 
@@ -49,6 +52,7 @@ def update_user(user_id):
 
 # get placement drives
 @admin_bp.route("/placement-drives")
+@cache.cached(key_prefix="admin_placement_drives")
 def get_placement_drives():
     return get_placement_drives_controller()
 
@@ -66,9 +70,3 @@ def get_applications():
 @admin_bp.route("/students/<int:student_id>", methods=["GET"])
 def get_student(student_id):
     return get_student_controller(student_id)
-
-
-
-
-
-

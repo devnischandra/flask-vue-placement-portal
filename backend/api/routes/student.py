@@ -11,6 +11,7 @@ from ..controllers.student import(
 
 from flask_jwt_extended import jwt_required
 from ..guards import require_student
+from extensions import cache
 
 student_bp = Blueprint("student",__name__,url_prefix="/student")
 
@@ -23,6 +24,7 @@ def verify_student_role():
 @student_bp.route('/')
 def get_me():
     return get_me_controller()
+
 # update student
 @student_bp.route('/', methods=['POST'])
 def update_student():
@@ -30,6 +32,7 @@ def update_student():
 
 # companies
 @student_bp.route('/companies', methods=['GET'])
+@cache.cached(key_prefix="companies")
 def get_companies():
     return get_companies_controller()
 
