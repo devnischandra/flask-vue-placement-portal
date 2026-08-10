@@ -5,8 +5,9 @@
             <thead>
                 <tr>
                     <th>ID</th>
+                    <th>Company Name</th>
                     <th>Job Title</th>
-                    <th>Start Date</th>
+                    <th>Started Date</th>
                     <th>End Date</th>
                     <th class="text-center">Action</th>
                 </tr>
@@ -14,6 +15,7 @@
             <tbody>
                 <tr v-for="placement_drive in ongoingPlacementDrives" :key="placement_drive.id">
                     <td>{{ placement_drive.id }}</td>
+                    <td>{{ placement_drive.company_name }}</td>
                     <td>{{ placement_drive.job_title }}</td>
                     <td>{{ placement_drive.start_date }}</td>
                     <td>{{ placement_drive.end_date }}</td>
@@ -27,6 +29,10 @@
                         :id="`placement_drive-${placement_drive.id}`"
                         :modal-title="`Placement Drive #${placement_drive.id}`"
                         >
+                        <h5>Company Details</h5>
+                            <p>Company ID: {{placement_drive.company_id}}</p>
+                            <p>Company Name: {{placement_drive.company_name}}</p>
+                        <br/>
                         <h5>Job Details</h5>
                             <p>Title: {{placement_drive.job_title}}</p>
                             <p>Mode: {{placement_drive.job_mode}}</p>

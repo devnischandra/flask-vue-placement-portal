@@ -75,6 +75,8 @@ def get_placement_drives_controller():
     return [
         {
             "id":p.id,
+            "company_id": p.company.id,
+            "company_name": p.company.user.name,
             "job_title":p.job_title,
             "description":p.description,
             "job_mode":p.job_mode,
