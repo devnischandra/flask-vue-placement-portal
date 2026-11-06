@@ -108,19 +108,31 @@ def get_student_controller(student_id):
 def update_application_controller(application_id):
     company_id = get_jwt_identity()
     application=Application.query.join(PlacementDrive).filter(PlacementDrive.company_id==company_id, Application.id==application_id).first()
-    data=request.get_json()
+    data=request.get_json(silent=True) or {}
 
     if application:
+        updated = False
         if "status" in data:
-            application.status=data.get('status')
-            db.session.commit()
+            status = data.get("status")
+            if status not in {"applied", "shortlisted", "selected", "rejected", "cancelled"}:
+                return abort(400)
+            application.status = status
+            updated = True
         if 'interview_date' in data:
             interview_date = data.get('interview_date')
-            application.interview_date= datetime.strptime(interview_date, '%Y-%m-%d').date()
-            db.session.commit()
+            try:
+                application.interview_date = datetime.strptime(interview_date, '%Y-%m-%d').date()
+            except (TypeError, ValueError):
+                return abort(400)
+            updated = True
         if 'company_feedback' in data:
             application.company_feedback=data.get('company_feedback')
-            db.session.commit()
+            updated = True
+
+        if not updated:
+            return abort(400)
+
+        db.session.commit()
         return{'msg': 'COMPANY FEEDBACK UPDATED SUCCESSFULLY'}, 200
     return abort(400)
 
