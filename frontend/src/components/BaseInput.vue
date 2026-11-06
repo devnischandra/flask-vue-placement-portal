@@ -14,6 +14,6 @@
 <script>
 export default{
     props: ['type','id','label','modelValue'],
-    emits: ['update:model-value']
+    emits: ['update:modelValue']
 }
 </script>
