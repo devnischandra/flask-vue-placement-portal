@@ -279,9 +279,6 @@ placement-portal-application/
 ## ⚠️ Known Limitations
 
 - **No automated tests.** The application is currently verified manually.
-- **Minimum-CGPA eligibility is enforced in the UI only.** The API still accepts an application from a student below the drive minimum.
-- **Generated-file downloads use a basic public route.** CSV and report files do not have per-user download authorization.
-- **Task-status lookup is currently unprotected.** Anyone with a task ID can query its status.
 - **Development configuration.** The API URL is hard-coded to `127.0.0.1:5000`, Flask runs in debug mode, and the token is stored in `localStorage`.
 - **SQLite and no migrations.** Appropriate for a course project, but not for concurrent production use.
 - **No pagination** on list endpoints.
