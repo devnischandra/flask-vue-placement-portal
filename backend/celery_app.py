@@ -20,9 +20,6 @@ celery.conf.beat_schedule = {
         "task": "tasks.interview_tasks.send_interview_reminders",
         "schedule": crontab(hour=5,minute=0)
     },
-}
-
-celery.conf.beat_schedule = {
     "generate-company-monthly-report": {
         "task": "tasks.report_tasks.generate_company_monthly_report",
         "schedule": crontab(day_of_month=1, hour=5, minute=0)
