@@ -31,7 +31,7 @@ It is version 2 of the Placement Portal, **built for the IIT Madras BS in Data S
 | **Backend** | ~1,230 lines of Python, 28 REST endpoints and 5 tables |
 | **Frontend** | ~1,870 lines of Vue 3 across 3 dashboards and 3 auth pages |
 | **Async work** | 2 scheduled jobs (daily and monthly) and 2 on-demand CSV exports |
-| **History** | 31 commits using [Conventional Commits](https://www.conventionalcommits.org/) |
+| **History** | 34 commits using [Conventional Commits](https://www.conventionalcommits.org/) |
 
 ## ✨ Features
 
