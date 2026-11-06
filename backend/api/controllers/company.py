@@ -12,7 +12,7 @@ def create_placement_drive_controller():
     company_id = get_jwt_identity()
     company=Company.query.get(company_id)
 
-    data=request.get_json()
+    data=request.get_json(silent=True) or {}
     job_title=data.get("job_title")
     description=data.get("description")
     job_mode=data.get("job_mode")
@@ -22,7 +22,20 @@ def create_placement_drive_controller():
     end_date=data.get("end_date")
 
 
-    if company and job_title and description and job_mode and minimum_cgpa and start_date and end_date:
+    if company and job_title and description and job_mode and minimum_cgpa is not None and start_date and end_date:
+        if job_mode not in {"office", "remote", "hybrid"}:
+            return abort(400)
+
+        try:
+            minimum_cgpa = float(minimum_cgpa)
+            start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+            end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
+        except (TypeError, ValueError):
+            return abort(400)
+
+        if minimum_cgpa < 0 or end_date < start_date:
+            return abort(400)
+
         new_placement_drive=PlacementDrive(
         company_id=company.id,
         job_title=job_title,
@@ -30,8 +43,8 @@ def create_placement_drive_controller():
         job_mode=job_mode,
         location=location,
         minimum_cgpa=minimum_cgpa,
-        start_date=datetime.strptime(start_date, "%Y-%m-%d").date(),
-        end_date=datetime.strptime(end_date, "%Y-%m-%d").date()
+        start_date=start_date,
+        end_date=end_date
         )
 
         db.session.add(new_placement_drive)
