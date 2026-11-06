@@ -118,16 +118,11 @@ def update_placement_drive_controller(placement_drive_id):
     data=request.get_json()
 
     if placement_drive and "end_date" in data:
-        company_id = placement_drive.company.id
         today=date.today()
         placement_drive.end_date=today-timedelta(days=1)
         db.session.commit()
 
         cache.delete("admin_placement_drives")
-        cache.delete_memoized(
-            get_placement_drives_controller,
-            company_id
-        )
 
         return {"msg": "PLACEMENT DRIVE UPDATED SUCCESSFULLY!"}, 200
     return abort(400)
