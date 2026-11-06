@@ -34,11 +34,12 @@ def get_companies_controller():
 
 def update_company_controller(company_id):
     company = Company.query.get(company_id)
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
     
     if company:
-        if "status" in data:
-            company.status = data.get('status')
+        status = data.get("status")
+        if status in {"pending", "approved", "rejected"}:
+            company.status = status
             db.session.commit()
 
             cache.delete("admin_companies")
