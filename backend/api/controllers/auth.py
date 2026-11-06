@@ -66,7 +66,7 @@ def create_company_controller():
     return abort(400)
 
 def create_student_controller():
-    data=request.get_json()
+    data=request.get_json(silent=True) or {}
     name=data.get("name")
     email=data.get("email")
     password=data.get('password')
@@ -78,7 +78,12 @@ def create_student_controller():
 
     existing_user=User.query.filter_by(email=email).first()
 
-    if name and email and password and (not existing_user):
+    if name and email and password and gender and date_of_birth and department and cgpa and (not existing_user):
+        try:
+            date_of_birth = datetime.strptime(date_of_birth, "%Y-%m-%d").date()
+        except (TypeError, ValueError):
+            return abort(400)
+
         password_hash=bcrypt.generate_password_hash(password).decode("utf-8")
         new_user=User(
             name=name,
@@ -88,22 +93,20 @@ def create_student_controller():
         db.session.add(new_user)
         db.session.flush()
 
-        if gender and date_of_birth and department and cgpa:
-            date_of_birth=datetime.strptime(date_of_birth,"%Y-%m-%d").date()
-            new_student=Student(
-                id=new_user.id,
-                gender=gender,
-                date_of_birth=date_of_birth,
-                department=department,
-                cgpa=cgpa,
-                resume_url=resume_url
-            )
-            db.session.add(new_student)
-            db.session.commit()
-            
-            return{
-                "msg":"STUDENT REGISTERED SUCCESSFULLY!"
-            },200
+        new_student=Student(
+            id=new_user.id,
+            gender=gender,
+            date_of_birth=date_of_birth,
+            department=department,
+            cgpa=cgpa,
+            resume_url=resume_url
+        )
+        db.session.add(new_student)
+        db.session.commit()
+
+        return{
+            "msg":"STUDENT REGISTERED SUCCESSFULLY!"
+        },200
     return abort(400)
 
 def get_me_controller():
