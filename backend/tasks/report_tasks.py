@@ -14,7 +14,7 @@ def generate_company_monthly_report():
             applications= [
                 application
                 for placement_drive in company.placement_drives
-                for application in placement_drive.application
+                for application in placement_drive.applications
             ]
             total_applications = len(applications)
             total_selected_applications = sum(
@@ -52,12 +52,13 @@ def generate_company_monthly_report():
                 body='Your Report is attached in HTML Form!'
             )
 
-            msg.attach(
-                filename=filename
-            )
+            with open(filename, "rb") as report_file:
+                msg.attach(
+                    filename=filename,
+                    content_type="text/html",
+                    data=report_file.read(),
+                )
 
             mail.send(msg)
 
         return len(companies)
-
-            
